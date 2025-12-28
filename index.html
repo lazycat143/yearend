@@ -1,0 +1,544 @@
+<!DOCTYPE html>
+<html lang="ru">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Мой 2025: Итоги</title>
+    
+    <link href="https://fonts.googleapis.com/css2?family=Montserrat:wght@300;400&family=Pacifico&family=Caveat:wght@400;700&display=swap" rel="stylesheet">
+    <link href="https://unpkg.com/aos@2.3.1/dist/aos.css" rel="stylesheet">
+    
+    <style>
+        :root {
+            --cream: #FFF9F0;
+            --deep-red: #9B2226;
+            --gold: #BB9457;
+            --forest: #154734;
+            --tape: rgba(255, 255, 255, 0.5);
+        }
+
+        body {
+            margin: 0;
+            padding: 0;
+            background-color: var(--cream);
+            background-image: url('https://www.transparenttextures.com/patterns/p6.png');
+            font-family: 'Montserrat', sans-serif;
+            color: #333;
+            overflow-x: hidden;
+        }
+
+        #snow-canvas { position: fixed; top: 0; left: 0; pointer-events: none; z-index: 100; }
+
+        /* Хедер */
+        .hero {
+            height: 100vh;
+            display: flex;
+            flex-direction: column;
+            align-items: center;
+            justify-content: center;
+            text-align: center;
+            background: radial-gradient(circle, rgba(255,255,255,0) 0%, rgba(245,230,210,0.4) 100%);
+        }
+
+        .hero h1 {
+            font-family: 'Pacifico', cursive;
+            font-size: clamp(3rem, 10vw, 6rem);
+            color: var(--deep-red);
+            margin: 0;
+        }
+
+        .hero-photo {
+            width: 280px;
+            height: 380px;
+            background: #e0e0e0;
+            margin-top: 30px;
+            border: 12px solid white;
+            box-shadow: 0 15px 35px rgba(0,0,0,0.1);
+            transform: rotate(-2deg);
+            position: relative;
+        }
+
+        /* Декоративный скотч */
+        .tape {
+            position: absolute;
+            width: 100px;
+            height: 30px;
+            background: var(--tape);
+            top: -15px;
+            left: 50%;
+            transform: translateX(-50%) rotate(2deg);
+            backdrop-filter: blur(2px);
+            border: 1px solid rgba(0,0,0,0.05);
+        }
+
+        /* Основной контейнер */
+        .container { max-width: 1100px; margin: 0 auto; padding: 50px 20px; }
+
+        .month-section {
+            display: grid;
+            grid-template-columns: 1fr 1fr;
+            gap: 60px;
+            margin-bottom: 150px;
+            align-items: center;
+        }
+
+        .month-section:nth-child(even) { direction: rtl; }
+        .month-section:nth-child(even) .journal-entry { direction: ltr; }
+
+        .month-name {
+            font-family: 'Caveat', cursive;
+            font-size: 4.5rem;
+            color: var(--forest);
+            margin-bottom: 15px;
+        }
+
+        .journal-entry {
+            background: white;
+            padding: 40px;
+            border-radius: 2px;
+            box-shadow: 10px 10px 0px var(--gold);
+            min-height: 200px;
+            font-size: 1.1rem;
+            line-height: 1.6;
+        }
+
+        /* Коллажи */
+        .collage-grid {
+            display: grid;
+            grid-template-columns: repeat(2, 1fr);
+            gap: 15px;
+            position: relative;
+        }
+
+        .img-placeholder {
+            background: #eee;
+            border: 8px solid #fff;
+            box-shadow: 0 5px 15px rgba(0,0,0,0.08);
+            aspect-ratio: 1/1;
+            transition: 0.4s ease;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            overflow: hidden;
+        }
+
+        .img-placeholder img { width: 100%; height: 100%; object-fit: cover; }
+        .img-placeholder:hover { transform: scale(1.05) rotate(0deg) !important; z-index: 5; }
+
+        /* Разные наклоны для скрапбук-эффекта */
+        .c-1 { transform: rotate(-3deg); }
+        .c-2 { transform: rotate(4deg); margin-top: 20px; }
+        .c-3 { transform: rotate(2deg); }
+        .c-4 { transform: rotate(-5deg); }
+
+        /* Музыка и кнопка */
+        .footer-controls {
+            text-align: center;
+            padding-bottom: 100px;
+        }
+
+        .btn {
+            background: var(--deep-red);
+            color: white;
+            padding: 18px 35px;
+            border: none;
+            border-radius: 50px;
+            font-size: 1rem;
+            font-weight: bold;
+            cursor: pointer;
+            transition: 0.3s;
+            text-decoration: none;
+            display: inline-block;
+        }
+
+        .btn:hover { background: var(--forest); transform: scale(1.05); }
+
+        .music-widget {
+            position: fixed;
+            bottom: 20px;
+            right: 20px;
+            background: white;
+            padding: 10px;
+            border-radius: 30px;
+            box-shadow: 0 5px 20px rgba(0,0,0,0.1);
+            z-index: 1000;
+        }
+
+        @media (min-width: 850px) {
+            .month-section {
+                flex-direction: row;
+                align-items: center;
+                gap: 60px;
+            }
+            .month-section:nth-child(even) { flex-direction: row-reverse; }
+            .month-section:nth-child(even) .month-name { text-align: right; }
+            .journal-entry { width: 100%; }
+            .collage-grid { width: 120%; }
+        }
+        @media (max-width: 380px) {
+            .collage-grid {
+                grid-template-columns: 1fr;
+                padding: 0 40px; /* Больше воздуха по бокам */
+            }
+        }
+        .img-placeholder {
+            background: #eee;
+            border: 6px solid #fff;
+            box-shadow: 0 4px 8px rgba(0,0,0,0.1);
+            aspect-ratio: 1/1;
+            transition: 0.3s;
+        }
+
+        .c-1 { transform: rotate(-3deg); }
+        .c-2 { transform: rotate(3deg); margin-top: 5px; }
+        .c-3 { transform: rotate(2deg); }
+        .c-4 { transform: rotate(-4deg); }
+
+        /* --- MUSIC & FOOTER --- */
+        .music-widget {
+            position: fixed;
+            bottom: 15px;
+            left: 50%;
+            transform: translateX(-50%);
+            background: rgba(255, 255, 255, 0.98);
+            padding: 5px 15px;
+            border-radius: 50px;
+            box-shadow: 0 5px 20px rgba(0,0,0,0.2);
+            z-index: 1000;
+            display: flex;
+            align-items: center;
+            border: 1px solid var(--gold);
+            width: max-content;
+        }
+
+        .footer-btn-wrap { text-align: center; padding: 40px 0 120px; }
+        .btn {
+            background: var(--deep-red);
+            color: white;
+            padding: 14px 25px;
+            border-radius: 50px;
+            text-decoration: none;
+            font-weight: bold;
+            font-size: 0.8rem;
+            border: none;
+        }
+
+        /* Desktop Adjustments */
+        @media (min-width: 768px) {
+            .month-section { display: grid; grid-template-columns: 1fr 1fr; gap: 40px; align-items: center; }
+            .month-section:nth-child(even) { direction: rtl; }
+            .month-section:nth-child(even) .journal-entry { direction: ltr; }
+        }
+        .hero {
+        height: 100vh;
+        display: flex;
+        flex-direction: column;
+        align-items: center;
+        justify-content: center;
+        padding: 20px;
+        position: relative;
+    }
+
+    /* Контейнер для фото и скотча */
+    .hero-wrapper {
+        position: relative;
+        padding-top: 20px;
+        z-index: 2;
+    }
+
+    /* Сама рамка */
+    .hero-photo {
+        width: clamp(250px, 70vw, 320px); /* Адаптивная ширина */
+        aspect-ratio: 3 / 4; /* Пропорция как у фото-карточки */
+        background-color: white;
+        padding: 12px 12px 40px 12px; /* Белые поля (снизу шире, как у полароида) */
+        box-shadow: 
+            0 10px 30px rgba(0,0,0,0.15), 
+            0 2px 5px rgba(0,0,0,0.05);
+        transform: rotate(-3deg); /* Легкий наклон для эффекта небрежности */
+        transition: transform 0.6s cubic-bezier(0.175, 0.885, 0.32, 1.275);
+    }
+
+    .hero-photo:hover {
+        transform: rotate(0deg) scale(1.02); /* Выравнивается при наведении */
+    }
+
+    /* Картинка внутри рамки */
+    .hero-photo img {
+        width: 100%;
+        height: 100%;
+        object-fit: cover; /* Заполняет рамку без растягивания */
+        display: block;
+        filter: sepia(10%) contrast(105%); /* Легкий винтажный фильтр */
+    }
+
+    /* Полупрозрачный матовый скотч */
+    .tape-decor {
+        position: absolute;
+        top: 0;
+        left: 50%;
+        transform: translateX(-50%) rotate(2deg);
+        width: 100px;
+        height: 35px;
+        background-color: rgba(255, 255, 255, 0.4);
+        backdrop-filter: blur(2px);
+        border: 1px solid rgba(255,255,255,0.2);
+        z-index: 3;
+        box-shadow: 0 2px 4px rgba(0,0,0,0.05);
+    }
+
+    .hero h1 {
+        font-family: 'Pacifico', cursive;
+        font-size: clamp(2.5rem, 10vw, 4.5rem);
+        color: var(--deep-red, #9B2226);
+        margin-top: 30px;
+        text-shadow: 2px 2px 4px rgba(0,0,0,0.05);
+    }
+        
+    </style>
+</head>
+<body>
+
+    <canvas id="snow-canvas"></canvas>
+
+    <header class="hero">
+        <div class="hero-wrapper" data-aos="zoom-in">
+            <div class="tape-decor"></div> <div class="hero-photo">
+                <img src="./img/d72e11149b1a1c4f9ccefe84d69209c5.jpg" alt="Main Photo">
+            </div>
+        </div>
+        <h1 data-aos="fade-up" data-aos-delay="300">Итоги 2025 и Воспоминания</h1>
+    </header>
+    
+    <main class="container">
+    
+        <section class="month-section" data-aos="fade-up">
+            <div>
+                <h2 class="month-name">Январь</h2>
+                <div class="journal-entry" contenteditable="true">Всё началось с того, что я познакомилась с челиком, 
+                    который в итоге сильно обманул, но сам факт общения с ним сделал 
+                    этот месяц ярким. Тогда же я выбила Мавуику, притворялась парнем в ДВ,
+                     начала вести блог в ТТ, выкладывая свои скетчи и рисуя на планшете для рисования.
+                      Это был старт моего творческого пути. (снова)</div>
+            </div>
+            <div class="collage-grid">
+                <div class="img-placeholder c-1"><img src="./img/photo_2025-12-28_23-02-39.jpg" alt=""></div>
+                <div class="img-placeholder c-2"><img src="./img/photo_2025-12-28_23-02-39 (2).jpg" alt=""></div>
+                <div class="img-placeholder c-3"><img src="./img/photo_2025-12-28_23-02-39 (3).jpg" alt=""></div>
+                <div class="img-placeholder c-4"><img src="./img/photo_2025-12-28_23-02-39 (4).jpg" alt=""></div>
+            </div>
+        </section>
+    
+        <section class="month-section" data-aos="fade-up">
+            <div>
+                <h2 class="month-name">Февраль</h2>
+                <div class="journal-entry" contenteditable="true">Я погрузилась в мир “Аркейн” — сериал, который оставил внутри меня целую вселенную.
+                     Мы снова начали общаться с Бехой — ну и нахуя это Celebrity нужно было.. 
+                     Пыталась восстановить мир Александры из снов, но с каждым разом это сложнее, так я забываю что там было..
+                      Побывала бабушкой Бобура и познакомилась с крутыми людьми из MarsIT — например,
+                       с Азамом</div>
+            </div>
+            <div class="collage-grid">
+                <div class="img-placeholder c-1"><img src="./img/photo_2025-12-28_23-14-01.jpg" alt=""></div>
+                <div class="img-placeholder c-2"><img src="./img/photo_2025-12-28_23-14-42.jpg" alt=""></div>
+                <div class="img-placeholder c-3"><img src="./img/photo_2025-12-28_23-13-05.jpg" alt=""></div>
+                <div class="img-placeholder c-4"><img src="./img/photo_2025-12-28_23-13-05 (2).jpg" alt=""></div>
+            </div>
+        </section>
+    
+        <section class="month-section" data-aos="fade-up">
+            <div>
+                <h2 class="month-name">Март</h2>
+                <div class="journal-entry" contenteditable="true">Весна, скорее всего из-за пубертата: я создала сайт с “тянками”,
+                     вдохновившись игрой “Альтушка для скуфа”.
+                      Хотела сделать версию с парнями, но проект остался незаконченным. 
+                      Всё равно — это был мой первый веб-эксперимент из чистой креативности.</div>
+            </div>
+            <div class="collage-grid">
+                <div class="img-placeholder c-1"><img src="./img/photo_2025-12-28_23-22-14.jpg" alt=""></div>
+                <div class="img-placeholder c-2"><img src="./img/photo_2025-12-28_23-22-14 (2).jpg" alt=""></div>
+                <div class="img-placeholder c-3"><img src="./img/photo_2025-12-28_23-22-14 (3).jpg" alt=""></div>
+               
+            </div>
+        </section>
+    
+        <section class="month-section" data-aos="fade-up">
+            <div>
+                <h2 class="month-name">Апрель</h2>
+                <div class="journal-entry" contenteditable="true">Самое сильное воспоминание года — фотосессия с классом.
+                     Это был момент, когда я почувствовала себя в настоящем с друзьями.
+                      Жто нудно было запомнить.</div>
+            </div>
+            <div class="collage-grid">
+                <div class="img-placeholder c-1"><img src="./img/photo_2025-12-28_23-27-38.jpg" alt=""></div>
+                <div class="img-placeholder c-2"><img src="./img/photo_2025-12-28_23-27-39 (2).jpg" alt=""></div>
+                <div class="img-placeholder c-3"><img src="./img/photo_2025-12-28_23-51-34.jpg" alt=""></div>
+                <div class="img-placeholder c-4"><img src="./img/photo_2025-12-28_23-27-38 (2).jpg" alt=""></div>
+            </div>
+        </section>
+    
+        <section class="month-section" data-aos="fade-up">
+            <div><h2 class="month-name">Май</h2><div class="journal-entry" contenteditable="true">Мои нервы жили на пределе — экзамены, выпускной, разговоры о поступлении в Вест, 
+                хотя я даже туда не хотела. 
+                Чувство, будто меня заставляли взрослеть быстрее, чем я готова.</div></div>
+            <div class="collage-grid">
+                <div class="img-placeholder c-1"><img src="./img/photo_2025-12-28_23-55-44.jpg" alt=""></div>
+                <div class="img-placeholder c-2"><img src="./img/photo_2025-12-28_23-55-39.jpg" alt=""></div>
+                
+            </div>
+        </section>
+    
+        <section class="month-section" data-aos="fade-up">
+            <div><h2 class="month-name">Июнь</h2><div class="journal-entry" contenteditable="true">Я начала создавать блог в Instagram,
+                 первые шаги в контенте. Результаты экзаменов — отличные,
+                  хотя мы списали, и зря вообще нервничала. Выпускной прошёл так,
+                  как нужно: весело, громко, круто. Дядя предложил работу с бинбегами. 
+                  Ещё съездили в зоопарк, погуляли в Seoul Moon, сделали классные фото.
+            </div></div>
+            <div class="collage-grid">
+                <div class="img-placeholder c-1"><img src="./img/photo_2025-12-28_23-59-04.jpg" alt=""></div>
+                <div class="img-placeholder c-2"><img src="./img/photo_2025-12-28_23-58-58.jpg" alt=""></div>
+                <div class="img-placeholder c-3"><img src="./img/photo_2025-12-28_23-59-15.jpg" alt=""></div>
+                <div class="img-placeholder c-4"><img src="./img/photo_2025-12-28_23-59-21.jpg" alt=""></div>
+            </div>
+        </section>
+    
+        <section class="month-section" data-aos="fade-up">
+            <div><h2 class="month-name">Июль</h2><div class="journal-entry" contenteditable="true">Лето расцвело: шашлыки, прогулки, пляж в Янги Узбекистан
+                . Лагерь стал сердцем июля — дискотеки, старые знакомые, трёхкратный чемпион по прыжкам в длину. В последний день я всё-таки решилась пригласить Влада на танец.
+             А потом под конец июля Анвар предложил с ним встречаться, на один день..</div></div>
+            <div class="collage-grid">
+                <div class="img-placeholder c-1"><img src="./img/photo_2025-12-29_00-07-41.jpg" alt=""></div>
+                <div class="img-placeholder c-2"><img src="./img/photo_2025-12-29_00-07-23.jpg" alt=""></div>
+                <div class="img-placeholder c-3"><img src="./img/photo_2025-12-29_00-07-28.jpg" alt=""></div>
+                <div class="img-placeholder c-4"><img src="./img/photo_2025-12-29_00-07-36.jpg" alt=""></div>
+            </div>
+        </section>
+    
+        <section class="month-section" data-aos="fade-up">
+            <div><h2 class="month-name">Август</h2><div class="journal-entry" contenteditable="true">Мой день рождения, паспорт, меня показывают по ТВ —ну типо я крутая. 
+                Я плакала весь свой ДР из-за ерунды.
+                 Создала новый вариант тянок, дочитала “Шах и мат”, 
+                 вступила в IT-волонтёрство. Ну как всегда август такой..</div></div>
+            <div class="collage-grid">
+                <div class="img-placeholder c-1"><img src="./img/photo_2025-12-29_00-09-25.jpg" alt=""></div>
+                <div class="img-placeholder c-2"><img src="./img/photo_2025-12-29_00-09-38.jpg" alt=""></div>
+                <div class="img-placeholder c-3"><img src="./img/photo_2025-12-29_00-09-20.jpg" alt=""></div>
+                <div class="img-placeholder c-4"><img src="./img/photo_2025-12-29_00-09-32.jpg" alt=""></div>
+            </div>
+        </section>
+    
+        <section class="month-section" data-aos="fade-up">
+            <div><h2 class="month-name">Сентябрь</h2><div class="journal-entry" contenteditable="true">Познакомилась с Робией — одной из значимых фигур IT-коммьюнити. 
+                Проект, который мечтала сделать, я забросила. В голове стало ясно: школа — скоро конец. Нужно закреплять связи, собирать фото, ловить людей и моменты.</div></div>
+            <div class="collage-grid">
+                <div class="img-placeholder c-1"><img src="./img/photo_2025-12-29_00-17-43.jpg" alt=""></div>
+                <div class="img-placeholder c-2"><img src="./img/photo_2025-12-29_00-17-49.jpg" alt=""></div>
+             
+            </div>
+        </section>
+    
+        <section class="month-section" data-aos="fade-up">
+            <div><h2 class="month-name">Октябрь</h2><div class="journal-entry" contenteditable="true">Очень странный месяц. Но я перешла на уровень B2 по английскому и снова начала активно общаться с Бекзодом. Что-то меня вернуло к жизни..</div></div>
+            <div class="collage-grid">
+                <div class="img-placeholder c-1"><img src="./img/photo_2025-12-29_00-20-06.jpg" alt=""></div>
+                <div class="img-placeholder c-2"><img src="./img/photo_2025-12-29_00-20-12.jpg" alt=""></div>
+            
+            </div>
+        </section>
+    
+        <section class="month-section" data-aos="fade-up">
+            <div><h2 class="month-name">Ноябрь</h2><div class="journal-entry" contenteditable="true">Школа вымотала. Семейные ситуации давили.</div></div>
+            <div class="collage-grid">
+                <div class="img-placeholder c-1"><img src="./img/yjz,hm.jpg" alt=""></div>
+                
+            </div>
+        </section>
+    
+        <section class="month-section" data-aos="fade-up">
+            <div><h2 class="month-name">Декабрь</h2><div class="journal-entry" contenteditable="true"> Появилось чувство: всё,
+                 пора жить по-другому. Надо лечить свои внутренние раны,
+                  учиться любить себя, думать о будущем и двигаться вперёд. У моей Софочки дршка и GeekCon она туда меня отнесла)) Снова стала популярити из-за лезгинки и думаю сходить в церковь
+            </div></div>
+            <div class="collage-grid">
+                <div class="img-placeholder c-1"><img src="./img/photo_2025-12-29_00-29-42.jpg" alt=""></div>
+                <div class="img-placeholder c-2"><img src="./img/photo_2025-12-29_00-29-36.jpg" alt=""></div>
+                
+        </section>
+    
+    </main>
+    
+    <div class="music-widget">
+        <div id="player"></div>
+    </div>
+
+<script src="https://unpkg.com/aos@2.3.1/dist/aos.js"></script>
+<script>
+    AOS.init({ duration: 1000, once: true });
+
+    // Снег
+    const canvas = document.getElementById('snow-canvas');
+    const ctx = canvas.getContext('2d');
+    let particles = [];
+    function resize() { canvas.width = window.innerWidth; canvas.height = window.innerHeight; }
+    window.addEventListener('resize', resize);
+    resize();
+
+    class Snowflake {
+        constructor() { this.reset(); }
+        reset() {
+            this.x = Math.random() * canvas.width;
+            this.y = Math.random() * -canvas.height;
+            this.size = Math.random() * 3 + 1;
+            this.speed = Math.random() * 1 + 0.5;
+            this.opacity = Math.random() * 0.5 + 0.3;
+        }
+        update() {
+            this.y += this.speed;
+            if (this.y > canvas.height) this.reset();
+        }
+        draw() {
+            ctx.fillStyle = `rgba(255, 255, 255, ${this.opacity})`;
+            ctx.beginPath();
+            ctx.arc(this.x, this.y, this.size, 0, Math.PI * 2);
+            ctx.fill();
+        }
+    }
+    for (let i = 0; i < 100; i++) particles.push(new Snowflake());
+    function animate() {
+        ctx.clearRect(0, 0, canvas.width, canvas.height);
+        particles.forEach(p => { p.update(); p.draw(); });
+        requestAnimationFrame(animate);
+    }
+    animate();
+    var tag = document.createElement('script');
+    tag.src = "https://www.youtube.com/iframe_api";
+    var firstScriptTag = document.getElementsByTagName('script')[0];
+    firstScriptTag.parentNode.insertBefore(tag, firstScriptTag);
+
+    var player;
+    function onYouTubeIframeAPIReady() {
+        player = new YT.Player('player', {
+            height: '40',
+            width: '200',
+            videoId: 'KhqNTjbQ71A', // ID из твоей ссылки
+            playerVars: {
+                'autoplay': 1,
+                'loop': 1,
+                'playlist': 'KhqNTjbQ71A', // Нужно для зацикливания
+                'controls': 1
+            },
+            events: {
+                'onReady': onPlayerReady
+            }
+        });
+    }
+
+    function onPlayerReady(event) {
+        // Из-за политики браузеров автоплей часто заблокирован до первого клика пользователя
+        // event.target.playVideo();
+    }
+</script>
+
+</body>
+</html>
